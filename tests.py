@@ -16,8 +16,6 @@ class PartyTests(unittest.TestCase):
         self.assertIn("board games, rainbows, and ice cream sundaes", result.data)
 
     def test_no_rsvp_yet(self):
-        # FIXME: Add a test to show we see the RSVP form, but NOT the
-        # party details
         result = self.client.get('/')
         self.assertIn('<h2>Please RSVP</h2>', result.data)
         self.assertNotIn('<h2>Party Details</h2>', result.data)
@@ -27,9 +25,9 @@ class PartyTests(unittest.TestCase):
                                   data={"name": "Jane",
                                         "email": "jane@jane.com"},
                                   follow_redirects=True)
-        # FIXME: Once we RSVP, we should see the party details, but
-        # not the RSVP form
-        print "FIXME"
+
+        self.assertIn('<h2>Party Details</h2>', result.data)
+        self.assertNotIn('<h2>Please RSVP</h2>', result.data)
 
 
 class PartyTestsDatabase(unittest.TestCase):
@@ -42,22 +40,32 @@ class PartyTestsDatabase(unittest.TestCase):
         app.config['TESTING'] = True
 
         # Connect to test database (uncomment when testing database)
-        # connect_to_db(app, "postgresql:///testdb")
+        connect_to_db(app, "postgresql:///testdb")
 
         # Create tables and add sample data (uncomment when testing database)
-        # db.create_all()
-        # example_data()
+        db.create_all()
+        example_data()
 
     def tearDown(self):
         """Do at end of every test."""
 
         # (uncomment when testing database)
-        # db.session.close()
-        # db.drop_all()
+        db.session.close()
+        db.drop_all()
 
     def test_games(self):
-        #FIXME: test that the games page displays the game from example_data()
-        print "FIXME"
+        """Runs the test games"""
+
+        result = self.client.get('/games')
+        # # this will show the status of the client browser
+        # # eg) 200 OK 
+        # print result.status
+        self.assertIn('madlibs', result.data)
+        self.assertIn('fun word game 1', result.data)
+
+        # with self.client as c:
+        #     with c.session_transaction() as sess:
+        #         # sess is a flask session
 
 
 if __name__ == "__main__":
